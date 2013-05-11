@@ -1,6 +1,6 @@
 package org.hy.common.pagination;
 
-import org.hy.common.util.KeySynchronizer;
+import org.juqkai.demo.support.util.KeySynchronizer;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
 
