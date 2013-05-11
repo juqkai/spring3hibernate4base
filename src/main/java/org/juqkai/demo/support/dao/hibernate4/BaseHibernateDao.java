@@ -2,16 +2,14 @@ package org.juqkai.demo.support.dao.hibernate4;
 
 import org.hibernate.*;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.ejb.QueryImpl;
 import org.hibernate.type.Type;
 import org.juqkai.demo.support.Part.Part;
 import org.juqkai.demo.support.dao.IBaseDao;
 import org.juqkai.demo.support.dao.util.ConditionQuery;
 import org.juqkai.demo.support.dao.util.OrderBy;
-import org.hy.common.pagination.PageUtil;
-import org.juqkai.demo.support.util.Assert;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
+import org.juqkai.demo.support.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -202,10 +200,12 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     }
 
     protected Integer listCount(final String hql, final Part<M> part, final Object... paramlist) {
-        LOG.debug(hql);
-//        Query query = getSession().createQuery(hql);
-//        Criteria criteria = getSession().cre
-        return 5;
+        LOG.info(hql);
+        String countHql = hql.substring(hql.toLowerCase().indexOf("from"));
+        countHql = "select count(*) " + countHql;
+        LOG.info(countHql);
+        Query query = getSession().createQuery(countHql);
+        return Integer.parseInt(query.uniqueResult().toString());
     }
 
     /**
@@ -266,11 +266,12 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     }
 
     @SuppressWarnings("unchecked")
-    public <T> List<T> listByNative(final String nativeSQL, final int pn, final int pageSize,
+    public Part<M> listByNative(final String nativeSQL, final Part<M> part,
                                     final List<Entry<String, Class<?>>> entityList,
                                     final List<Entry<String, Type>> scalarList, final Object... paramlist) {
 
         SQLQuery query = getSession().createSQLQuery(nativeSQL);
+        Part<M> p = part;
         if (entityList != null) {
             for (Entry<String, Class<?>> entity : entityList) {
                 query.addEntity(entity.getKey(), entity.getValue());
@@ -283,16 +284,15 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         }
 
         setParameters(query, paramlist);
-
-        if (pn > -1 && pageSize > -1) {
-            query.setMaxResults(pageSize);
-            int start = PageUtil.getPageStart(pn, pageSize);
-            if (start != 0) {
-                query.setFirstResult(start);
-            }
+        if (null != p) {
+            query.setMaxResults(p.getLength());
+            query.setFirstResult(p.getStart());
+        } else {
+            p = new Part<M>();
         }
-        List<T> result = query.list();
-        return result;
+        List<M> result = query.list();
+        p.addAll(result);
+        return p;
     }
 
     @SuppressWarnings("unchecked")

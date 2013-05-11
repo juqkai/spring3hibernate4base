@@ -1,9 +1,9 @@
 package org.juqkai.demo.support.service;
 
+import org.juqkai.demo.support.Part.Part;
+
 import java.io.Serializable;
 import java.util.List;
-
-import org.hy.common.pagination.Page;
 
 public interface ICommonService {
 
@@ -25,8 +25,6 @@ public interface ICommonService {
 
     public <T> List<T> listAll(Class<T> entityClass);
 
-    public <T> Page<T> listAll(Class<T> entityClass, int pn);
-
-    public <T> Page<T> listAll(Class<T> entityClass, int pn, int pageSize);
+    public <T> Part<T> listAll(Class<T> entityClass, Part<T> part);
 
 }

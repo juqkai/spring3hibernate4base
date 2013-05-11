@@ -6,7 +6,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.juqkai.demo.support.Part.Part;
 import org.juqkai.demo.support.dao.ICommonDao;
-import org.hy.common.pagination.PageUtil;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Component("CommonHibernateDao")
 public class CommonHibernateDao implements ICommonDao {

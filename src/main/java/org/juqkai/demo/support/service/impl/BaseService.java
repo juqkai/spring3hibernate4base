@@ -1,109 +1,85 @@
 package org.juqkai.demo.support.service.impl;
 
-import java.util.List;
-
-import org.hy.common.Constants;
 import org.juqkai.demo.support.Part.Part;
 import org.juqkai.demo.support.dao.IBaseDao;
-import org.hy.common.pagination.Page;
-import org.hy.common.pagination.PageUtil;
 import org.juqkai.demo.support.service.IBaseService;
+
+import java.util.List;
 
 public abstract class BaseService<M extends java.io.Serializable, PK extends java.io.Serializable> implements IBaseService<M, PK> {
     
-    protected IBaseDao<M, PK> baseDao;
+//    protected IBaseDao<M, PK> baseDao;
     
-    public abstract void setBaseDao(IBaseDao<M, PK> baseDao);
+    public abstract IBaseDao<M, PK> getBaseDao();
     
 
     @Override
     public M save(M model) {
-        baseDao.save(model);
+        getBaseDao().save(model);
         return model;
     }
     
     @Override
     public void merge(M model) {
-        baseDao.merge(model);
+        getBaseDao().merge(model);
     }
 
     @Override
     public void saveOrUpdate(M model) {
-        baseDao.saveOrUpdate(model);
+        getBaseDao().saveOrUpdate(model);
     }
 
     @Override
     public void update(M model) {
-        baseDao.update(model);
+        getBaseDao().update(model);
     }
     
     @Override
     public void delete(PK id) {
-        baseDao.delete(id);
+        getBaseDao().delete(id);
     }
 
     @Override
     public void deleteObject(M model) {
-        baseDao.deleteObject(model);
+        getBaseDao().deleteObject(model);
     }
 
     @Override
     public M get(PK id) {
-        return baseDao.get(id);
+        return getBaseDao().get(id);
     }
 
    
     
     @Override
     public int countAll() {
-        return baseDao.countAll();
+        return getBaseDao().countAll();
     }
 
     @Override
     public List<M> listAll() {
-        return baseDao.listAll();
+        return getBaseDao().listAll();
     }
-    @Override
-    public Part<M> listAll(int pn) {
 
-        return this.listAll(pn, Constants.DEFAULT_PAGE_SIZE);
-    }
-    
-    public Page<M> listAllWithOptimize(int pn) {
-        return this.listAllWithOptimize(pn, Constants.DEFAULT_PAGE_SIZE);
-    }
-    
     @Override
-    public Part<M> listAll(int pn, int pageSize) {
+    public Part<M> listAll(Part<M> part) {
         Integer count = countAll();
-        List<M> items = baseDao.listAll(pn);
-        return PageUtil.getPage(count, pn, items, pageSize);
+        return getBaseDao().listAll(part);
     }
-    public Page<M> listAllWithOptimize(int pn, int pageSize) {
+    public Part<M> listAllWithOptimize(Part<M> part) {
         Integer count = countAll();
-        List<M> items = baseDao.listAll(pn);
-        return PageUtil.getPage(count, pn, items, pageSize);
+        return getBaseDao().listAll(part);
     }
     
     @Override
-    public Part<M> pre(PK pk, int pn, int pageSize) {
+    public Part<M> pre(PK pk, Part<M> part) {
         Integer count = countAll();
-        List<M> items = baseDao.pre(pk, pageSize);
-        return PageUtil.getPage(count, pn, items, pageSize);
+        return getBaseDao().pre(pk, part);
     }
     @Override
-    public Part<M> next(PK pk, int pn, int pageSize) {
+    public Part<M> next(PK pk, Part<M> part) {
         Integer count = countAll();
-        List<M> items = baseDao.next(pk, pageSize);
-        return PageUtil.getPage(count, pn, items, pageSize);
+        return getBaseDao().next(pk, part);
     }
-    @Override
-    public Part<M> pre(PK pk, int pn) {
-        return pre(pk, pn, Constants.DEFAULT_PAGE_SIZE);
-    }
-    @Override
-    public Part<M> next(PK pk, int pn) {
-        return next(pk, pn, Constants.DEFAULT_PAGE_SIZE);
-    }
-    
+
 }

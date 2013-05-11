@@ -2,6 +2,10 @@ package org.juqkai.demo.controller;
 
 import org.juqkai.demo.model.Demo;
 import org.juqkai.demo.service.demo.DemoService;
+import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.service.IBaseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,7 +37,16 @@ public class DemoController {
     @RequestMapping(value = "/save")
     public ModelAndView save(Demo demo) {
         ModelAndView view = new ModelAndView("/demo");
-        demoService.save(demo);
+//        demoService.save(demo);
+        return view;
+    }
+
+    @RequestMapping("/list")
+    public ModelAndView list(){
+        Part<Demo> part = new Part<Demo>();
+        part = demoService.findAll();
+        ModelAndView view = new ModelAndView();
+        view.addObject("part", part);
         return view;
     }
 }

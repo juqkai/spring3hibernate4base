@@ -1,16 +1,14 @@
 package org.juqkai.demo.support.service.impl;
 
-import java.io.Serializable;
-import java.util.List;
-
-import org.hy.common.Constants;
+import org.juqkai.demo.support.Part.Part;
 import org.juqkai.demo.support.dao.ICommonDao;
-import org.hy.common.pagination.Page;
-import org.hy.common.pagination.PageUtil;
 import org.juqkai.demo.support.service.ICommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Service("CommonService")
 public class CommonService implements ICommonService {
@@ -58,14 +56,9 @@ public class CommonService implements ICommonService {
         return commonDao.listAll(entityClass);
     }
     
-    public <T> Page<T> listAll(Class<T> entityClass, int pn) {
-        return listAll(entityClass, pn, Constants.DEFAULT_PAGE_SIZE);
-    }
-    
-    public <T> Page<T> listAll(Class<T> entityClass, int pn, int pageSize) {
+    public <T> Part<T> listAll(Class<T> entityClass, Part<T> part) {
         int total = countAll(entityClass);
-        List<T> items = commonDao.listAll(entityClass, pn, pageSize);
-        return PageUtil.getPage(total, pn, items, pageSize);
+        return commonDao.listAll(entityClass, part);
     }
 
 }

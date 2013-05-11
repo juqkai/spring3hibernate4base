@@ -1,6 +1,7 @@
 package org.juqkai.demo.model;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * User: juqkai(juqkai@gmail.com)
@@ -9,7 +10,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="code")
-public class Demo {
+public class Demo implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
