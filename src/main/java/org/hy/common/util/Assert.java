@@ -153,7 +153,6 @@ public abstract class Assert {
      * 
      * @param text the String to check
      * @param message the exception message to use if the assertion fails
-     * @see org.apache.commons.lang.StringUtils#hasLength
      */
     public static void hasLength(String text, String message) {
         if (StringUtils.isEmpty(text)) {
@@ -169,7 +168,6 @@ public abstract class Assert {
      * </pre>
      * 
      * @param text the String to check
-     * @see org.apache.commons.lang.StringUtils#hasLength
      */
     public static void hasLength(String text) {
         hasLength(text, "[Assertion failed] - this String argument must have length; it must not be null or empty");
@@ -200,7 +198,6 @@ public abstract class Assert {
      * </pre>
      * 
      * @param text the String to check
-     * @see org.apache.commons.lang.StringUtils#hasText
      */
     public static void hasText(String text) {
         hasText(text, "[Assertion failed] - this String argument must have text; it must not be null, empty, or blank");

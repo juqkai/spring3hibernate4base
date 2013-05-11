@@ -1,7 +1,7 @@
 package org.hy.common.web.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.juqkai.demo.support.log.Log;
+import org.juqkai.demo.support.log.Logs;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +15,7 @@ public class ImageFilter implements Filter {
     private static final List<String> contentTypes = new ArrayList<String>();
     private static final Map<String, String> imageTypes = new HashMap<String, String>();
 
-    private static Logger LOGGER = LoggerFactory.getLogger(ImageFilter.class);
+    private static Log LOGGER = Logs.get();
 
     private List<String> filterDate = new ArrayList<String>();
 
@@ -73,7 +73,7 @@ public class ImageFilter implements Filter {
         for (String c : contentTypes) {
             if (accept.contains(c)) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{} is image request,Accept:{}", request.getRequestURI(), accept);
+                    LOGGER.debug(String.format("%s is image request,Accept:%s", request.getRequestURI(), accept));
                 }
                 return true;
             }

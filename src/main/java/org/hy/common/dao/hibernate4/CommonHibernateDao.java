@@ -11,13 +11,15 @@ import org.hy.common.Constants;
 import org.hy.common.dao.ICommonDao;
 import org.hy.common.model.AbstractModel;
 import org.hy.common.pagination.PageUtil;
+import org.juqkai.demo.support.log.Log;
+import org.juqkai.demo.support.log.Logs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component("CommonHibernateDao")
 public class CommonHibernateDao implements ICommonDao {
-    
+    protected static final Log LOG = Logs.get();
   
       @Autowired
     @Qualifier("sessionFactory")

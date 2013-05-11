@@ -1,7 +1,7 @@
 package org.hy.common.web;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.juqkai.demo.support.log.Log;
+import org.juqkai.demo.support.log.Logs;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -17,7 +17,7 @@ import java.util.*;
 
 public class JavassContentNegotiatingViewResolver extends ContentNegotiatingViewResolver {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(JavassContentNegotiatingViewResolver.class);
+    private static final Log LOGGER = Logs.get();
     private List<View> defaultViews;
     private List<ViewResolver> viewResolvers;
 

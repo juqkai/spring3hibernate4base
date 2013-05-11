@@ -1,6 +1,5 @@
 package org.hy.common.model;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hy.common.service.ICommonService;
 import org.hy.common.util.SpringContextUtil;
 
@@ -13,10 +12,10 @@ public abstract class AbstractModel implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = 926886392330633823L;
 
-	@Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this);
-    }
+//	@Override
+//    public String toString() {
+//        return ToStringBuilder.reflectionToString(this);
+//    }
 
     
     public void save() {

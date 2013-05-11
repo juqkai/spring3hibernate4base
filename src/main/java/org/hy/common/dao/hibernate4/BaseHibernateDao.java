@@ -1,21 +1,6 @@
 package org.hy.common.dao.hibernate4;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.persistence.Id;
-
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.type.Type;
 import org.hy.common.dao.IBaseDao;
@@ -23,14 +8,20 @@ import org.hy.common.dao.util.ConditionQuery;
 import org.hy.common.dao.util.OrderBy;
 import org.hy.common.pagination.PageUtil;
 import org.hy.common.util.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.juqkai.demo.support.log.Log;
+import org.juqkai.demo.support.log.Logs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import javax.persistence.Id;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.*;
+import java.util.Map.Entry;
+
 public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extends java.io.Serializable> implements IBaseDao<M, PK> {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(BaseHibernateDao.class);
+    protected static final Log LOG = Logs.get();
 
     private final Class<M> entityClass;
     private final String HQL_LIST_ALL;
@@ -190,6 +181,15 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return results;
     }
 
+    /**
+     * 查询
+     * @param hql
+     * @param pn pageNumber
+     * @param pageSize
+     * @param paramlist 参数列表
+     * @param <T>
+     * @return
+     */
     @SuppressWarnings("unchecked")
     protected <T> List<T> list(final String hql, final int pn, final int pageSize, final Object... paramlist) {
         Query query = getSession().createQuery(hql);

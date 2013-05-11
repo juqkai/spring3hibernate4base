@@ -1,15 +1,14 @@
 package org.hy.common.pagination;
 
+import org.hy.common.util.KeySynchronizer;
+import org.juqkai.demo.support.log.Log;
+import org.juqkai.demo.support.log.Logs;
+
+import javax.persistence.Id;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-
-import javax.persistence.Id;
-
-import org.hy.common.util.KeySynchronizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PageUtil {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(PageUtil.class);
+    private static final Log LOG = Logs.get();
     /**
      * 获取主键时缓存
      */
@@ -79,7 +78,7 @@ public class PageUtil {
             }
         }
         if(pkField == null) {
-            LOGGER.error("page error,{} : pk null", cls);
+            LOG.error("page error,{} : pk null", new NullPointerException());
         }
         return pkField;
     }
@@ -93,7 +92,7 @@ public class PageUtil {
         try {
             retVal = pkField.get(obj).toString();
         } catch (Exception e) {
-            LOGGER.error("page error,{} : get id value", obj);
+            LOG.error("page error,{} : get id value", e);
         }
         return retVal;
     }
@@ -106,7 +105,7 @@ public class PageUtil {
         try {
             retVal = pkField.getName();
         } catch (Exception e) {
-            LOGGER.error("page error,{} : get id name", obj);
+            LOG.error("page error,{} : get id name", e);
         }
         return retVal;
     }
