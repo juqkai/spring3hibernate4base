@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.hy.common.Constants;
 import org.hy.common.dao.ICommonDao;
-import org.hy.common.model.AbstractModel;
 import org.hy.common.pagination.Page;
 import org.hy.common.pagination.PageUtil;
 import org.hy.common.service.ICommonService;
@@ -21,49 +20,49 @@ public class CommonService implements ICommonService {
     private ICommonDao commonDao;
 
 
-    public <T extends AbstractModel> T save(T model) {
+    public <T> T save(T model) {
         return commonDao.save(model);
     }
 
-    public <T extends AbstractModel> void saveOrUpdate(T model) {
+    public <T> void saveOrUpdate(T model) {
         commonDao.saveOrUpdate(model);
         
     }
     
-    public <T extends AbstractModel> void update(T model) {
+    public <T> void update(T model) {
         commonDao.update(model);
     }
     
-    public <T extends AbstractModel> void merge(T model) {
+    public <T> void merge(T model) {
         commonDao.merge(model);
     }
 
-    public <T extends AbstractModel, PK extends Serializable> void delete(Class<T> entityClass, PK id) {
+    public <T, PK extends Serializable> void delete(Class<T> entityClass, PK id) {
         commonDao.delete(entityClass, id);
     }
 
-    public <T extends AbstractModel> void deleteObject(T model) {
+    public <T> void deleteObject(T model) {
         commonDao.deleteObject(model);
     }
 
-    public <T extends AbstractModel, PK extends Serializable> T get(Class<T> entityClass, PK id) {
+    public <T, PK extends Serializable> T get(Class<T> entityClass, PK id) {
         return commonDao.get(entityClass, id);
         
     }
     
-    public <T extends AbstractModel> int countAll(Class<T> entityClass) {
+    public <T> int countAll(Class<T> entityClass) {
         return commonDao.countAll(entityClass);
     }
     
-    public <T extends AbstractModel> List<T> listAll(Class<T> entityClass) {
+    public <T> List<T> listAll(Class<T> entityClass) {
         return commonDao.listAll(entityClass);
     }
     
-    public <T extends AbstractModel> Page<T> listAll(Class<T> entityClass, int pn) {
+    public <T> Page<T> listAll(Class<T> entityClass, int pn) {
         return listAll(entityClass, pn, Constants.DEFAULT_PAGE_SIZE);
     }
     
-    public <T extends AbstractModel> Page<T> listAll(Class<T> entityClass, int pn, int pageSize) {
+    public <T> Page<T> listAll(Class<T> entityClass, int pn, int pageSize) {
         int total = countAll(entityClass);
         List<T> items = commonDao.listAll(entityClass, pn, pageSize);
         return PageUtil.getPage(total, pn, items, pageSize);

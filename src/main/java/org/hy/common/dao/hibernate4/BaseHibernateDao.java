@@ -111,7 +111,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
 
     @Override
     public List<M> listAll() {
-        return list(HQL_LIST_ALL);
+        return listAll(HQL_LIST_ALL);
     }
 
     @Override
@@ -149,7 +149,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
 
     protected long getIdResult(String hql, Object... paramlist) {
         long result = -1;
-        List<?> list = list(hql, paramlist);
+        List<?> list = listAll(hql, paramlist);
         if (list != null && list.size() > 0) {
             return ((Number) list.get(0)).longValue();
         }
@@ -187,11 +187,10 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
      * @param pn pageNumber
      * @param pageSize
      * @param paramlist 参数列表
-     * @param <T>
      * @return
      */
     @SuppressWarnings("unchecked")
-    protected <T> List<T> list(final String hql, final int pn, final int pageSize, final Object... paramlist) {
+    protected List<M> list(final String hql, final int pn, final int pageSize, final Object... paramlist) {
         Query query = getSession().createQuery(hql);
         setParameters(query, paramlist);
         if (pn > -1 && pageSize > -1) {
@@ -204,7 +203,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         if (pn < 0) {
             query.setFirstResult(0);
         }
-        List<T> results = query.list();
+        List<M> results = query.list();
         return results;
     }
 
@@ -262,7 +261,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return result == null ? 0 : ((Integer) result).intValue();
     }
 
-    protected <T> List<T> list(final String sql, final Object... paramlist) {
+    protected List<M> listAll(final String sql, final Object... paramlist) {
         return list(sql, -1, -1, paramlist);
     }
         
