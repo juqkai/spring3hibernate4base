@@ -6,8 +6,6 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.type.Type;
 import org.juqkai.demo.support.Part.Part;
 import org.juqkai.demo.support.dao.IBaseDao;
-import org.juqkai.demo.support.dao.util.ConditionQuery;
-import org.juqkai.demo.support.dao.util.OrderBy;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
 import org.juqkai.demo.support.util.Assert;
@@ -330,28 +328,6 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
 
         Object result = query.uniqueResult();
         return (T) result;
-    }
-
-    @SuppressWarnings("unchecked")
-    public Part<M> list(ConditionQuery query, OrderBy orderBy, final Part<M> part) {
-        Criteria criteria = getSession().createCriteria(this.entityClass);
-        Assert.notNull(part);
-        query.build(criteria);
-        orderBy.build(criteria);
-        part.setTotal(listCount(query, orderBy));
-        criteria.setFirstResult(part.getStart());
-        criteria.setMaxResults(part.getLength());
-        List<M> list = criteria.list();
-        part.addAll(list);
-        return part;
-    }
-
-
-    public Integer listCount(ConditionQuery query, OrderBy orderBy) {
-        Criteria criteria = getSession().createCriteria(this.entityClass);
-        query.build(criteria);
-        orderBy.build(criteria);
-        return Integer.parseInt(criteria.uniqueResult().toString());
     }
 
     @SuppressWarnings("unchecked")
