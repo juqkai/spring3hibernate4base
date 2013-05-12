@@ -1,4 +1,6 @@
-package org.hy.common.dao;
+package org.juqkai.demo.support.dao;
+
+import org.juqkai.demo.support.Part.Part;
 
 import java.io.Serializable;
 import java.util.List;
@@ -21,11 +23,11 @@ public interface ICommonDao {
     
     public <T> int countAll(Class<T> entityClass);
     
-    public <T> List<T> listAll(Class<T> entityClass);
+    public <T> Part<T> listAll(Class<T> entityClass);
     
-    public <T> List<T> listAll(Class<T> entityClass, int pn);
+    public <T> Part<T> listAll(Class<T> entityClass, Part<T> part);
     
-    public <T> List<T> listAll(Class<T> entityClass, int pn, int pageSize);
+//    public <T> Part<T> listAll(Class<T> entityClass, int pn, int pageSize);
     
 
 }

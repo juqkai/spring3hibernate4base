@@ -1,20 +1,19 @@
-package org.hy.common.dao.hibernate4;
+package org.juqkai.demo.support.dao.hibernate4;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
-import org.hy.common.Constants;
-import org.hy.common.dao.ICommonDao;
-import org.hy.common.pagination.PageUtil;
+import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.dao.ICommonDao;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
+import org.juqkai.demo.support.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Component("CommonHibernateDao")
 public class CommonHibernateDao implements ICommonDao {
@@ -68,24 +67,25 @@ public class CommonHibernateDao implements ICommonDao {
 
     
     @SuppressWarnings("unchecked")
-    public <T> List<T> listAll(Class<T> entityClass) {
+    public <T> Part<T> listAll(Class<T> entityClass) {
         Criteria criteria = getSession().createCriteria(entityClass);
-        criteria.setProjection(Projections.rowCount());
-        return criteria.list();
+        Part<T> part = new Part<T>();
+        part.addAll(criteria.list());
+        return part;
     }
     
-    public <T> List<T> listAll(Class<T> entityClass, int pn) {
-        return listAll(entityClass, pn, Constants.DEFAULT_PAGE_SIZE);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public <T> List<T> listAll(Class<T> entityClass, int pn, int pageSize) {
+    public <T> Part<T> listAll(Class<T> entityClass, Part<T> part) {
         Criteria criteria = getSession().createCriteria(entityClass);
-        criteria.setFirstResult(PageUtil.getPageStart(pn, pageSize));
-        return criteria.list();
-        
+        Assert.notNull(part);
+        part.setTotal(listCount(criteria));
+        criteria.setFirstResult(part.getStart());
+        part.addAll(criteria.list());
+        return part;
     }
-    
 
+    public Integer listCount(Criteria criteria) {
+        criteria.setProjection(Projections.rowCount());
+        return Integer.parseInt(criteria.uniqueResult().toString());
+    }
     
 }

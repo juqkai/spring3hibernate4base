@@ -6,7 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-public class DateFormatValidator implements ConstraintValidator<DateFormat, Date> {
+public class DateFormatValidator implements  ConstraintValidator<DateFormat, Date> {
 
     private Pattern pattern;
     

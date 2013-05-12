@@ -1,15 +1,14 @@
-package org.hy.common.dao.hibernate4;
+package org.juqkai.demo.support.dao.hibernate4;
 
 import org.hibernate.*;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.type.Type;
-import org.hy.common.dao.IBaseDao;
-import org.hy.common.dao.util.ConditionQuery;
-import org.hy.common.dao.util.OrderBy;
-import org.hy.common.pagination.PageUtil;
-import org.hy.common.util.Assert;
+import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.dao.IBaseDao;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
+import org.juqkai.demo.support.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -34,19 +33,19 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     public BaseHibernateDao() {
         this.entityClass = (Class<M>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         Field[] fields = this.entityClass.getDeclaredFields();
-        for(Field f : fields) {
-            if(f.isAnnotationPresent(Id.class)) {
+        for (Field f : fields) {
+            if (f.isAnnotationPresent(Id.class)) {
                 this.pkName = f.getName();
             }
         }
-        
+
         Assert.notNull(pkName);
         HQL_LIST_ALL = "from " + this.entityClass.getSimpleName() + " order by " + pkName + " desc";
         HQL_OPTIMIZE_PRE_LIST_ALL = "from " + this.entityClass.getSimpleName() + " where " + pkName + " > ? order by " + pkName + " asc";
         HQL_OPTIMIZE_NEXT_LIST_ALL = "from " + this.entityClass.getSimpleName() + " where " + pkName + " < ? order by " + pkName + " desc";
         HQL_COUNT_ALL = " select count(*) from " + this.entityClass.getSimpleName();
     }
-        
+
     @Autowired
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
@@ -56,8 +55,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return sessionFactory.getCurrentSession();
     }
 
-   
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public PK save(M model) {
@@ -110,31 +108,32 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
 
 
     @Override
-    public List<M> listAll() {
+    public Part<M> listAll() {
         return listAll(HQL_LIST_ALL);
     }
 
     @Override
-    public List<M> listAll(int pn, int pageSize) {
-        return list(HQL_LIST_ALL, pn, pageSize);
+    public Part<M> listAll(Part<M> part) {
+        return list(HQL_LIST_ALL, part);
     }
-    
+
     @Override
-    public List<M> pre(PK pk, int pn, int pageSize) {
-        if(pk == null) {
-            return list(HQL_LIST_ALL, pn, pageSize);
+    public Part<M> pre(PK pk, Part<M> part) {
+        if (pk == null) {
+            return list(HQL_LIST_ALL, part);
         }
         //倒序，重排
-        List<M> result = list(HQL_OPTIMIZE_PRE_LIST_ALL, 1, pageSize, pk);
+        Part<M> result = list(HQL_OPTIMIZE_PRE_LIST_ALL, part, pk);
         Collections.reverse(result);
         return result;
     }
+
     @Override
-    public List<M> next(PK pk, int pn, int pageSize) {
-        if(pk == null) {
-            return list(HQL_LIST_ALL, pn, pageSize);
+    public Part<M> next(PK pk, Part<M> part) {
+        if (pk == null) {
+            return list(HQL_LIST_ALL, part);
         }
-        return list(HQL_OPTIMIZE_NEXT_LIST_ALL, 1, pageSize, pk);
+        return list(HQL_OPTIMIZE_NEXT_LIST_ALL, part, pk);
     }
 
     @Override
@@ -156,8 +155,8 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return result;
     }
 
-    protected List<M> listSelf(final String hql, final int pn, final int pageSize, final Object... paramlist) {
-        return this.<M> list(hql, pn, pageSize, paramlist);
+    protected List<M> listSelf(final String hql, final Part<M> part, final Object... paramlist) {
+        return this.<M>list(hql, part, paramlist);
     }
 
 
@@ -165,46 +164,51 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
      * for in
      */
     @SuppressWarnings("unchecked")
-    protected <T> List<T> listWithIn(final String hql,final int start, final int length, final Map<String, Collection<?>> map, final Object... paramlist) {
+    protected Part<M> listWithIn(final String hql, final Part<M> part, final Map<String, Collection<?>> map, final Object... paramlist) {
         Query query = getSession().createQuery(hql);
+        Assert.notNull(part);
         setParameters(query, paramlist);
-        for (Entry<String, Collection<?>> e : map.entrySet()) {
-            query.setParameterList(e.getKey(), e.getValue());
-        }
-        if (start > -1 && length > -1) {
-            query.setMaxResults(length);
-            if (start != 0) {
-                query.setFirstResult(start);
+        if (map != null) {
+            for (Entry<String, Collection<?>> e : map.entrySet()) {
+                query.setParameterList(e.getKey(), e.getValue());
             }
         }
-        List<T> results = query.list();
-        return results;
+        part.setTotal(listCount(query.getQueryString(), paramlist));
+        query.setFirstResult(part.getStart());
+        query.setMaxResults(part.getLength());
+        List<M> results = query.list();
+        part.addAll(results);
+        return part;
     }
 
     /**
      * 查询
+     *
      * @param hql
-     * @param pn pageNumber
-     * @param pageSize
      * @param paramlist 参数列表
      * @return
      */
     @SuppressWarnings("unchecked")
-    protected List<M> list(final String hql, final int pn, final int pageSize, final Object... paramlist) {
-        Query query = getSession().createQuery(hql);
-        setParameters(query, paramlist);
-        if (pn > -1 && pageSize > -1) {
-            query.setMaxResults(pageSize);
-            int start = PageUtil.getPageStart(pn, pageSize);
-            if (start != 0) {
-                query.setFirstResult(start);
-            }
-        }
-        if (pn < 0) {
-            query.setFirstResult(0);
-        }
-        List<M> results = query.list();
-        return results;
+    protected Part<M> list(final String hql, final Part<M> part, final Object... paramlist) {
+        return listWithIn(hql, part, null, paramlist);
+    }
+
+    protected Integer listCount(final String hql, final Object... paramlist) {
+        String countHql = fetctCountSql(hql);
+        Query query = getSession().createQuery(countHql);
+        return Integer.parseInt(query.uniqueResult().toString());
+    }
+
+    /**
+     * 获取统计数量的SQL/HQL
+     *
+     * @param sql
+     * @return
+     */
+    private String fetctCountSql(String sql) {
+        String countHql = sql.substring(sql.toLowerCase().indexOf("from"));
+        countHql = "select count(*) " + countHql;
+        return countHql;
     }
 
     /**
@@ -217,10 +221,9 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return (T) query.setMaxResults(1).uniqueResult();
     }
 
-       /**
-        * 
-        * for in
-        */
+    /**
+     * for in
+     */
     @SuppressWarnings("unchecked")
     protected <T> T aggregate(final String hql, final Map<String, Collection<?>> map, final Object... paramlist) {
         Query query = getSession().createQuery(hql);
@@ -233,7 +236,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
 
         return (T) query.uniqueResult();
     }
-        
+
     @SuppressWarnings("unchecked")
     protected <T> T aggregate(final String hql, final Object... paramlist) {
         Query query = getSession().createQuery(hql);
@@ -253,7 +256,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         Object result = query.executeUpdate();
         return result == null ? 0 : ((Integer) result).intValue();
     }
-    
+
     protected int execteNativeBulk(final String natvieSQL, final Object... paramlist) {
         Query query = getSession().createSQLQuery(natvieSQL);
         setParameters(query, paramlist);
@@ -261,16 +264,17 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return result == null ? 0 : ((Integer) result).intValue();
     }
 
-    protected List<M> listAll(final String sql, final Object... paramlist) {
-        return list(sql, -1, -1, paramlist);
+    protected Part<M> listAll(final String sql, final Object... paramlist) {
+        return list(sql, new Part<M>(), paramlist);
     }
-        
+
     @SuppressWarnings("unchecked")
-    public <T> List<T> listByNative(final String nativeSQL, final int pn, final int pageSize,
-            final List<Entry<String, Class<?>>> entityList, 
-            final List<Entry<String, Type>> scalarList, final Object... paramlist) {
+    public Part<M> listByNative(final String nativeSQL, final Part<M> part,
+                                final List<Entry<String, Class<?>>> entityList,
+                                final List<Entry<String, Type>> scalarList, final Object... paramlist) {
 
         SQLQuery query = getSession().createSQLQuery(nativeSQL);
+        Assert.notNull(part);
         if (entityList != null) {
             for (Entry<String, Class<?>> entity : entityList) {
                 query.addEntity(entity.getKey(), entity.getValue());
@@ -283,18 +287,34 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         }
 
         setParameters(query, paramlist);
+        part.setTotal(listByNativeCount(nativeSQL, entityList, scalarList, paramlist));
+        query.setMaxResults(part.getLength());
+        query.setFirstResult(part.getStart());
+        List<M> result = query.list();
+        part.addAll(result);
+        return part;
+    }
 
-        if (pn > -1 && pageSize > -1) {
-            query.setMaxResults(pageSize);
-            int start = PageUtil.getPageStart(pn, pageSize);
-            if (start != 0) {
-                query.setFirstResult(start);
+    public Integer listByNativeCount(final String nativeSQL,
+                                     final List<Entry<String, Class<?>>> entityList,
+                                     final List<Entry<String, Type>> scalarList, final Object... paramlist) {
+        String sql = fetctCountSql(nativeSQL);
+        SQLQuery query = getSession().createSQLQuery(sql);
+        if (entityList != null) {
+            for (Entry<String, Class<?>> entity : entityList) {
+                query.addEntity(entity.getKey(), entity.getValue());
             }
         }
-        List<T> result = query.list();
-        return result;
+        if (scalarList != null) {
+            for (Entry<String, Type> entity : scalarList) {
+                query.addScalar(entity.getKey(), entity.getValue());
+            }
+        }
+
+        setParameters(query, paramlist);
+        return Integer.parseInt(query.uniqueResult().toString());
     }
-        
+
     @SuppressWarnings("unchecked")
     protected <T> T aggregateByNative(final String natvieSQL, final List<Entry<String, Type>> scalarList, final Object... paramlist) {
         SQLQuery query = getSession().createSQLQuery(natvieSQL);
@@ -309,23 +329,19 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         Object result = query.uniqueResult();
         return (T) result;
     }
-        
-    @SuppressWarnings("unchecked")
-    public <T> List<T> list(ConditionQuery query, OrderBy orderBy, final int pn, final int pageSize) {
-        Criteria criteria = getSession().createCriteria(this.entityClass);
-        query.build(criteria);
-        orderBy.build(criteria);
-        int start = PageUtil.getPageStart(pn, pageSize);
-        if(start != 0) {
-            criteria.setFirstResult(start);
-        }
-        criteria.setMaxResults(pageSize);
-        return criteria.list();
-    }
 
     @SuppressWarnings("unchecked")
-    public <T> List<T> list(Criteria criteria) {
-        return criteria.list();
+    public Part<M> list(Criteria criteria) {
+        Part<M> part = new Part<M>();
+        part.setTotal(listCount(criteria));
+        criteria.setProjection(Projections.projectionList());
+        part.addAll(criteria.list());
+        return part;
+    }
+
+    public Integer listCount(Criteria criteria) {
+        criteria.setProjection(Projections.rowCount());
+        return Integer.parseInt(criteria.uniqueResult().toString());
     }
 
     @SuppressWarnings("unchecked")
@@ -333,7 +349,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return (T) criteria.uniqueResult();
     }
 
-    public <T> List<T> list(DetachedCriteria criteria) {
+    public Part<M> list(DetachedCriteria criteria) {
         return list(criteria.getExecutableCriteria(getSession()));
     }
 
@@ -345,9 +361,9 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     protected void setParameters(Query query, Object[] paramlist) {
         if (paramlist != null) {
             for (int i = 0; i < paramlist.length; i++) {
-                if(paramlist[i] instanceof Date) {
+                if (paramlist[i] instanceof Date) {
                     //TODO 难道这是bug 使用setParameter不行？？
-                    query.setTimestamp(i, (Date)paramlist[i]);
+                    query.setTimestamp(i, (Date) paramlist[i]);
                 } else {
                     query.setParameter(i, paramlist[i]);
                 }
@@ -355,5 +371,5 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         }
     }
 
-        
+
 }

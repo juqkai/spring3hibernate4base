@@ -1,3 +1,7 @@
 .idea/
 target/
 *.iml
+classes/*
+lib/*
+classes/
+src/main/webapp/WEB-INF/lib/

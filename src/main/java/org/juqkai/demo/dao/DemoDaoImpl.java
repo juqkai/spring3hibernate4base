@@ -2,6 +2,8 @@ package org.juqkai.demo.dao;
 
 import org.hibernate.SessionFactory;
 import org.juqkai.demo.model.Demo;
+import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.dao.hibernate4.BaseHibernateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -15,7 +17,7 @@ import javax.annotation.Resource;
  * Time: 上午11:37
  */
 @Repository
-public class DemoDaoImpl implements DemoDao{
+public class DemoDaoImpl extends BaseHibernateDao<Demo, Long> implements DemoDao{
 
     @Autowired
     @Qualifier("sessionFactory")
@@ -25,8 +27,9 @@ public class DemoDaoImpl implements DemoDao{
         return (Demo) sessionFactory.getCurrentSession().get(Demo.class, id);
     }
 
-    @Override
-    public void save(Demo demo) {
-        sessionFactory.getCurrentSession().save(demo);
+    public Part<Demo> findAll() {
+        String hql = "select id, name from Demo";
+        return list(hql, null);
     }
+
 }

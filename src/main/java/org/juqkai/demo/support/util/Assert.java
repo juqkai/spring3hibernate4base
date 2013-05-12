@@ -14,7 +14,7 @@
  * the License.
  */
 
-package org.hy.common.util;
+package org.juqkai.demo.support.util;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;

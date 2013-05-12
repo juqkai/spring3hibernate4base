@@ -1,9 +1,5 @@
 package org.hy.common.pagination;
 
-import org.apache.taglibs.standard.tag.common.core.UrlSupport;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
@@ -116,7 +112,7 @@ public class NavigationTagV2 extends TagSupport {
      * @throws javax.servlet.jsp.JspException
      */
     private String resolveUrl(String url, javax.servlet.jsp.PageContext pageContext) throws JspException{
-        url = UrlSupport.resolveUrl(url, null, pageContext);
+//        url = UrlSupport.resolveUrl(url, null, pageContext);
 
         url = url.replaceAll("&pn=\\d*", "").replaceAll("pn=\\d*", "").replaceAll("&pre=true", "").replaceAll("&id=\\d*", "").replaceAll("id=\\d*", "");
 
