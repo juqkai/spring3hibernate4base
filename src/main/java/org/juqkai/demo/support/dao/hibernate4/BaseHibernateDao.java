@@ -2,6 +2,7 @@ package org.juqkai.demo.support.dao.hibernate4;
 
 import org.hibernate.*;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
 import org.hibernate.type.Type;
 import org.juqkai.demo.support.Part.Part;
 import org.juqkai.demo.support.dao.IBaseDao;
@@ -167,24 +168,19 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     @SuppressWarnings("unchecked")
     protected Part<M> listWithIn(final String hql, final Part<M> part, final Map<String, Collection<?>> map, final Object... paramlist) {
         Query query = getSession().createQuery(hql);
-        Part<M> p = part;
+        Assert.notNull(part);
         setParameters(query, paramlist);
         if (map != null) {
             for (Entry<String, Collection<?>> e : map.entrySet()) {
                 query.setParameterList(e.getKey(), e.getValue());
             }
         }
-        if (null != p) {
-            p.setTotal(listCount(query.getQueryString(), p, paramlist));
-            query.setFirstResult(p.getStart());
-            query.setMaxResults(p.getLength());
-        } else {
-            p = new Part<M>();
-            p.setTotal(listCount(query.getQueryString(), p, paramlist));
-        }
+        part.setTotal(listCount(query.getQueryString(), paramlist));
+        query.setFirstResult(part.getStart());
+        query.setMaxResults(part.getLength());
         List<M> results = query.list();
-        p.addAll(results);
-        return p;
+        part.addAll(results);
+        return part;
     }
 
     /**
@@ -199,13 +195,22 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return listWithIn(hql, part, null, paramlist);
     }
 
-    protected Integer listCount(final String hql, final Part<M> part, final Object... paramlist) {
-        LOG.info(hql);
-        String countHql = hql.substring(hql.toLowerCase().indexOf("from"));
-        countHql = "select count(*) " + countHql;
-        LOG.info(countHql);
+    protected Integer listCount(final String hql, final Object... paramlist) {
+        String countHql = fetctCountSql(hql);
         Query query = getSession().createQuery(countHql);
         return Integer.parseInt(query.uniqueResult().toString());
+    }
+
+    /**
+     * 获取统计数量的SQL/HQL
+     *
+     * @param sql
+     * @return
+     */
+    private String fetctCountSql(String sql) {
+        String countHql = sql.substring(sql.toLowerCase().indexOf("from"));
+        countHql = "select count(*) " + countHql;
+        return countHql;
     }
 
     /**
@@ -267,11 +272,11 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
 
     @SuppressWarnings("unchecked")
     public Part<M> listByNative(final String nativeSQL, final Part<M> part,
-                                    final List<Entry<String, Class<?>>> entityList,
-                                    final List<Entry<String, Type>> scalarList, final Object... paramlist) {
+                                final List<Entry<String, Class<?>>> entityList,
+                                final List<Entry<String, Type>> scalarList, final Object... paramlist) {
 
         SQLQuery query = getSession().createSQLQuery(nativeSQL);
-        Part<M> p = part;
+        Assert.notNull(part);
         if (entityList != null) {
             for (Entry<String, Class<?>> entity : entityList) {
                 query.addEntity(entity.getKey(), entity.getValue());
@@ -284,15 +289,32 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         }
 
         setParameters(query, paramlist);
-        if (null != p) {
-            query.setMaxResults(p.getLength());
-            query.setFirstResult(p.getStart());
-        } else {
-            p = new Part<M>();
-        }
+        part.setTotal(listByNativeCount(nativeSQL, entityList, scalarList, paramlist));
+        query.setMaxResults(part.getLength());
+        query.setFirstResult(part.getStart());
         List<M> result = query.list();
-        p.addAll(result);
-        return p;
+        part.addAll(result);
+        return part;
+    }
+
+    public Integer listByNativeCount(final String nativeSQL,
+                                     final List<Entry<String, Class<?>>> entityList,
+                                     final List<Entry<String, Type>> scalarList, final Object... paramlist) {
+        String sql = fetctCountSql(nativeSQL);
+        SQLQuery query = getSession().createSQLQuery(sql);
+        if (entityList != null) {
+            for (Entry<String, Class<?>> entity : entityList) {
+                query.addEntity(entity.getKey(), entity.getValue());
+            }
+        }
+        if (scalarList != null) {
+            for (Entry<String, Type> entity : scalarList) {
+                query.addScalar(entity.getKey(), entity.getValue());
+            }
+        }
+
+        setParameters(query, paramlist);
+        return Integer.parseInt(query.uniqueResult().toString());
     }
 
     @SuppressWarnings("unchecked")
@@ -313,25 +335,37 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     @SuppressWarnings("unchecked")
     public Part<M> list(ConditionQuery query, OrderBy orderBy, final Part<M> part) {
         Criteria criteria = getSession().createCriteria(this.entityClass);
-        Part<M> p = new Part<M>();
+        Assert.notNull(part);
         query.build(criteria);
         orderBy.build(criteria);
-        if (null != p) {
-            criteria.setFirstResult(p.getStart());
-            criteria.setMaxResults(p.getLength());
-        } else {
-            p = new Part<M>();
-        }
+        part.setTotal(listCount(query, orderBy));
+        criteria.setFirstResult(part.getStart());
+        criteria.setMaxResults(part.getLength());
         List<M> list = criteria.list();
-        p.addAll(list);
-        return p;
+        part.addAll(list);
+        return part;
+    }
+
+
+    public Integer listCount(ConditionQuery query, OrderBy orderBy) {
+        Criteria criteria = getSession().createCriteria(this.entityClass);
+        query.build(criteria);
+        orderBy.build(criteria);
+        return Integer.parseInt(criteria.uniqueResult().toString());
     }
 
     @SuppressWarnings("unchecked")
     public Part<M> list(Criteria criteria) {
         Part<M> part = new Part<M>();
+        part.setTotal(listCount(criteria));
+        criteria.setProjection(Projections.projectionList());
         part.addAll(criteria.list());
         return part;
+    }
+
+    public Integer listCount(Criteria criteria) {
+        criteria.setProjection(Projections.rowCount());
+        return Integer.parseInt(criteria.uniqueResult().toString());
     }
 
     @SuppressWarnings("unchecked")

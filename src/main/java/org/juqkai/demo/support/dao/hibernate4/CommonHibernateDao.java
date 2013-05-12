@@ -8,6 +8,7 @@ import org.juqkai.demo.support.Part.Part;
 import org.juqkai.demo.support.dao.ICommonDao;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
+import org.juqkai.demo.support.util.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -75,20 +76,16 @@ public class CommonHibernateDao implements ICommonDao {
     
     public <T> Part<T> listAll(Class<T> entityClass, Part<T> part) {
         Criteria criteria = getSession().createCriteria(entityClass);
+        Assert.notNull(part);
+        part.setTotal(listCount(criteria));
         criteria.setFirstResult(part.getStart());
         part.addAll(criteria.list());
-//        return listAll(entityClass, part, Constants.DEFAULT_PAGE_SIZE);
         return part;
     }
-    
-//    @SuppressWarnings("unchecked")
-//    public <T> Part<T> listAll(Class<T> entityClass, int pn, int pageSize) {
-//        Criteria criteria = getSession().createCriteria(entityClass);
-//        criteria.setFirstResult(PageUtil.getPageStart(pn, pageSize));
-//        return criteria.list();
-//
-//    }
-    
 
+    public Integer listCount(Criteria criteria) {
+        criteria.setProjection(Projections.rowCount());
+        return Integer.parseInt(criteria.uniqueResult().toString());
+    }
     
 }
