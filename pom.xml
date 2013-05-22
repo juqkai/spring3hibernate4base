@@ -160,8 +160,8 @@
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.1.1</version>
-            <!--防止打包到war中, 否则会与tomcat等容器包冲突-->
-            <scope>provided</scope>
+            <!--&lt;!&ndash;防止打包到war中, 否则会与tomcat等容器包冲突&ndash;&gt;-->
+            <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>taglibs</groupId>
