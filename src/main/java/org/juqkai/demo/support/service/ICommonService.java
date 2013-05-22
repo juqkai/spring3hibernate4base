@@ -1,6 +1,6 @@
 package org.juqkai.demo.support.service;
 
-import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.part.Part;
 
 import java.io.Serializable;
 import java.util.List;

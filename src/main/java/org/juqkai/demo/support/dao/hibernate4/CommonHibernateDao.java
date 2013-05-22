@@ -4,7 +4,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
-import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.part.Part;
 import org.juqkai.demo.support.dao.ICommonDao;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;

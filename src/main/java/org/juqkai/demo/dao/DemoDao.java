@@ -1,7 +1,7 @@
 package org.juqkai.demo.dao;
 
 import org.juqkai.demo.model.Demo;
-import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.part.Part;
 import org.juqkai.demo.support.dao.IBaseDao;
 
 /**

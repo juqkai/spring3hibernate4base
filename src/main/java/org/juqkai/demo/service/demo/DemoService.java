@@ -1,7 +1,7 @@
 package org.juqkai.demo.service.demo;
 
 import org.juqkai.demo.model.Demo;
-import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.part.Part;
 import org.juqkai.demo.support.service.IBaseService;
 
 /**

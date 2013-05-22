@@ -1,6 +1,6 @@
 package org.juqkai.demo.support.service.impl;
 
-import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.part.Part;
 import org.juqkai.demo.support.dao.ICommonDao;
 import org.juqkai.demo.support.service.ICommonService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,6 @@
 package org.juqkai.demo.support.dao;
 
-import org.juqkai.demo.support.Part.Part;
-
-import java.util.List;
+import org.juqkai.demo.support.part.Part;
 
 public interface IBaseDao<M extends java.io.Serializable, PK extends java.io.Serializable> {
     

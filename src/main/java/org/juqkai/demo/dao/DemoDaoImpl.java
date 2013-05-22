@@ -2,13 +2,11 @@ package org.juqkai.demo.dao;
 
 import org.hibernate.SessionFactory;
 import org.juqkai.demo.model.Demo;
-import org.juqkai.demo.support.Part.Part;
+import org.juqkai.demo.support.part.Part;
 import org.juqkai.demo.support.dao.hibernate4.BaseHibernateDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
-
-import javax.annotation.Resource;
 
 
 /**

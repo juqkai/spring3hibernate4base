@@ -1,4 +1,4 @@
-package org.juqkai.demo.support.Part;
+package org.juqkai.demo.support.part;
 
 import java.util.ArrayList;
 import java.util.Iterator;
