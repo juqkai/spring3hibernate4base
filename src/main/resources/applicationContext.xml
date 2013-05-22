@@ -96,4 +96,7 @@
         </tx:attributes>
     </tx:advice>
 
+
+    <import resource="classpath:cxf-servlet.xml" ></import>
+
 </beans>

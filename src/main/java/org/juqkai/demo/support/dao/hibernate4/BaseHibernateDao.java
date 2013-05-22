@@ -32,11 +32,19 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     @SuppressWarnings("unchecked")
     public BaseHibernateDao() {
         this.entityClass = (Class<M>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-        Field[] fields = this.entityClass.getDeclaredFields();
-        for (Field f : fields) {
-            if (f.isAnnotationPresent(Id.class)) {
-                this.pkName = f.getName();
+
+        Class<?> klass = this.entityClass;
+        WHILE:
+        while (!klass.equals(Object.class)) {
+
+            Field[] fields = klass.getDeclaredFields();
+            for (Field f : fields) {
+                if (f.isAnnotationPresent(Id.class)) {
+                    this.pkName = f.getName();
+                    break WHILE;
+                }
             }
+            klass = klass.getSuperclass();
         }
 
         Assert.notNull(pkName);
