@@ -17,7 +17,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.Map.Entry;
-
 public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extends java.io.Serializable> implements IBaseDao<M, PK> {
 
     protected static final Log LOG = Logs.get();
@@ -132,7 +131,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         }
         //倒序，重排
         Part<M> result = list(HQL_OPTIMIZE_PRE_LIST_ALL, part, pk);
-        Collections.reverse(result);
+        Collections.reverse(result.getVals());
         return result;
     }
 
@@ -156,7 +155,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
 
     protected long getIdResult(String hql, Object... paramlist) {
         long result = -1;
-        List<?> list = listAll(hql, paramlist);
+        List<?> list = listAll(hql, paramlist).getVals();
         if (list != null && list.size() > 0) {
             return ((Number) list.get(0)).longValue();
         }
@@ -164,7 +163,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     }
 
     protected List<M> listSelf(final String hql, final Part<M> part, final Object... paramlist) {
-        return this.<M>list(hql, part, paramlist);
+        return this.<M>list(hql, part, paramlist).getVals();
     }
 
 

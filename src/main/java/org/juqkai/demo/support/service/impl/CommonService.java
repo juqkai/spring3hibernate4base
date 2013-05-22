@@ -53,7 +53,7 @@ public class CommonService implements ICommonService {
     }
     
     public <T> List<T> listAll(Class<T> entityClass) {
-        return commonDao.listAll(entityClass);
+        return commonDao.listAll(entityClass).getVals();
     }
     
     public <T> Part<T> listAll(Class<T> entityClass, Part<T> part) {

@@ -1,6 +1,8 @@
 package org.juqkai.demo.support.Part;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 数据片段,
@@ -9,7 +11,8 @@ import java.util.*;
  * Date: 13-5-11
  * Time: 下午6:37
  */
-public class Part<T> extends ArrayList<T>{
+public class Part<T> implements Iterable<T>{
+    private List<T> vals = new ArrayList<T>();
     //片段长度
     private Integer length = 20;
     //索引, 每几页, 默认为1
@@ -82,5 +85,18 @@ public class Part<T> extends ArrayList<T>{
     public void setCount(Integer count) {
         this.count = count;
     }
+
+    public List<T> getVals() {
+        return vals;
+    }
+
+    public Iterator<T> iterator() {
+        return vals.iterator();
+    }
+
+    public void addAll(List<T> results) {
+        this.vals.addAll(results);
+    }
+
 
 }

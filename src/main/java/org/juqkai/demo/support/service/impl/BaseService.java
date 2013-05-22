@@ -58,7 +58,7 @@ public abstract class BaseService<M extends java.io.Serializable, PK extends jav
 
     @Override
     public List<M> listAll() {
-        return getBaseDao().listAll();
+        return getBaseDao().listAll().getVals();
     }
 
     @Override
