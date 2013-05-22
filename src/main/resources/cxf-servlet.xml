@@ -25,7 +25,7 @@
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
     <!--全注解拦截的核心-->
-    <bean id="webServicesAgent" class="com.surekam.gjb2.support.cxf.Jsr181HandlerMapping">
+    <bean id="webServicesAgent" class="org.juqkai.demo.support.cxf.Jsr181HandlerMapping">
         <property name="urlPrefix"><value>/ws</value></property>
     </bean>
 </beans>
