@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.juqkai</groupId>
-    <artifactId>base</artifactId>
+    <artifactId>spring3hibernate4base</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>baseFramework Maven Webapp</name>
