@@ -11,7 +11,7 @@ import java.util.List;
  * Date: 13-5-11
  * Time: 下午6:37
  */
-public class Part<T> implements Iterable<T>{
+public class Part<T>{
     private List<T> vals = new ArrayList<T>();
     //片段长度
     private Integer length = 20;
@@ -88,10 +88,6 @@ public class Part<T> implements Iterable<T>{
 
     public List<T> getVals() {
         return vals;
-    }
-
-    public Iterator<T> iterator() {
-        return vals.iterator();
     }
 
     public void addAll(List<T> results) {

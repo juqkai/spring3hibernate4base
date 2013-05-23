@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.Map.Entry;
+
 public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extends java.io.Serializable> implements IBaseDao<M, PK> {
 
     protected static final Log LOG = Logs.get();
@@ -330,9 +331,7 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
                 query.addScalar(entity.getKey(), entity.getValue());
             }
         }
-
         setParameters(query, paramlist);
-
         Object result = query.uniqueResult();
         return (T) result;
     }
@@ -341,7 +340,9 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
     public Part<M> list(Criteria criteria) {
         Part<M> part = new Part<M>();
         part.setTotal(listCount(criteria));
-        criteria.setProjection(Projections.projectionList());
+        criteria.setProjection(null);
+        criteria.setFirstResult(part.getStart());
+        criteria.setMaxResults(part.getLength());
         part.addAll(criteria.list());
         return part;
     }
@@ -377,6 +378,5 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
             }
         }
     }
-
 
 }
