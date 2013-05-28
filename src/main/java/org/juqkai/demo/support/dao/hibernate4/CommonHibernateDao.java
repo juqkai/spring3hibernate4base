@@ -3,31 +3,36 @@ package org.juqkai.demo.support.dao.hibernate4;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
 import org.juqkai.demo.support.part.Part;
 import org.juqkai.demo.support.dao.ICommonDao;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
 import org.juqkai.demo.support.util.Assert;
+import org.juqkai.demo.support.util.Param;
+import org.juqkai.demo.support.util.Params;
+import org.juqkai.demo.support.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Component("CommonHibernateDao")
 public class CommonHibernateDao implements ICommonDao {
     protected static final Log LOG = Logs.get();
-  
-      @Autowired
+
+    @Autowired
     @Qualifier("sessionFactory")
     private SessionFactory sessionFactory;
 
     public Session getSession() {
         return sessionFactory.getCurrentSession();
-    } 
-    
-    
+    }
+
+
     public <T> T save(T model) {
         getSession().save(model);
         return model;
@@ -35,13 +40,13 @@ public class CommonHibernateDao implements ICommonDao {
 
     public <T> void saveOrUpdate(T model) {
         getSession().saveOrUpdate(model);
-        
+
     }
-    
+
     public <T> void update(T model) {
         getSession().update(model);
     }
-    
+
     public <T> void merge(T model) {
         getSession().merge(model);
     }
@@ -56,16 +61,16 @@ public class CommonHibernateDao implements ICommonDao {
 
     public <T, PK extends Serializable> T get(Class<T> entityClass, PK id) {
         return (T) getSession().get(entityClass, id);
-        
+
     }
-    
+
     public <T> int countAll(Class<T> entityClass) {
         Criteria criteria = getSession().createCriteria(entityClass);
         criteria.setProjection(Projections.rowCount());
         return ((Long) criteria.uniqueResult()).intValue();
     }
 
-    
+
     @SuppressWarnings("unchecked")
     public <T> Part<T> listAll(Class<T> entityClass) {
         Criteria criteria = getSession().createCriteria(entityClass);
@@ -73,7 +78,7 @@ public class CommonHibernateDao implements ICommonDao {
         part.addAll(criteria.list());
         return part;
     }
-    
+
     public <T> Part<T> listAll(Class<T> entityClass, Part<T> part) {
         Criteria criteria = getSession().createCriteria(entityClass);
         Assert.notNull(part);
@@ -87,5 +92,30 @@ public class CommonHibernateDao implements ICommonDao {
         criteria.setProjection(Projections.rowCount());
         return Integer.parseInt(criteria.uniqueResult().toString());
     }
-    
+
+    @SuppressWarnings("unchecked")
+    public<M> Part<M> list(Criteria criteria, Part<?> p) {
+        Part<M> part = new Part<M>(p);
+        part.setTotal(listCount(criteria));
+        criteria.setProjection(null);
+        criteria.setFirstResult(p.getStart());
+        criteria.setMaxResults(p.getLength());
+        part.addAll(criteria.list());
+        return part;
+    }
+
+    public <M> Part<M> findForParams(Class<M> entityClass, Params params, Part<?> part) {
+        Criteria criteria = getSession().createCriteria(entityClass);
+        Assert.notNull(params);
+        List<Param> list = params.parse();
+        for (Param p : list) {
+            if (Strings.isBlank(p.getVal())) {
+                continue;
+            }
+            Criterion criterion = p.makeRestrictions();
+            criteria.add(criterion);
+        }
+        return list(criteria, part);
+    }
+
 }

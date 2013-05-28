@@ -7,18 +7,18 @@ import org.juqkai.demo.support.service.IBaseService;
 import java.util.List;
 
 public abstract class BaseService<M extends java.io.Serializable, PK extends java.io.Serializable> implements IBaseService<M, PK> {
-    
+
 //    protected IBaseDao<M, PK> baseDao;
-    
+
     public abstract IBaseDao<M, PK> getBaseDao();
-    
+
 
     @Override
     public M save(M model) {
         getBaseDao().save(model);
         return model;
     }
-    
+
     @Override
     public void merge(M model) {
         getBaseDao().merge(model);
@@ -33,7 +33,7 @@ public abstract class BaseService<M extends java.io.Serializable, PK extends jav
     public void update(M model) {
         getBaseDao().update(model);
     }
-    
+
     @Override
     public void delete(PK id) {
         getBaseDao().delete(id);
@@ -49,8 +49,8 @@ public abstract class BaseService<M extends java.io.Serializable, PK extends jav
         return getBaseDao().get(id);
     }
 
-   
-    
+
+
     @Override
     public int countAll() {
         return getBaseDao().countAll();
@@ -70,7 +70,7 @@ public abstract class BaseService<M extends java.io.Serializable, PK extends jav
         Integer count = countAll();
         return getBaseDao().listAll(part);
     }
-    
+
     @Override
     public Part<M> pre(PK pk, Part<M> part) {
         Integer count = countAll();

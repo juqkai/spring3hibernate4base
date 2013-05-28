@@ -11,16 +11,33 @@ import java.util.List;
  * Date: 13-5-11
  * Time: 下午6:37
  */
-public class Part<T>{
+public class Part<T> {
+    public static final String PARAM_LENGTH = "length";
+    public static final String PARAM_INDEX = "index";
+    public static final Integer DEFAULT_LENGTH = 20;
+
     private List<T> vals = new ArrayList<T>();
     //片段长度
     private Integer length = 20;
     //索引, 每几页, 默认为1
     private Integer index = 1;
     //总页数
-    private Integer count;
+    private Integer count = 1;
     //总数
-    private Integer total;
+    private Integer total = 1;
+    //请求的URL
+    private String url;
+
+
+    public Part(){}
+
+    public Part(Part<?> part) {
+        this.setCount(part.getCount());
+        this.setIndex(part.getIndex());
+        this.setLength(part.getLength());
+        this.setUrl(part.getUrl());
+    }
+
 
 
     public Integer getStart(){
@@ -69,7 +86,7 @@ public class Part<T>{
     }
 
     public void setIndex(Integer index) {
-        if (index <= 0) {
+        if (null == index || index <= 0) {
             index = 1;
         }
         if (index > count) {
@@ -90,9 +107,19 @@ public class Part<T>{
         return vals;
     }
 
+    public void setVals(List<T> vals) {
+        this.vals = vals;
+    }
+
     public void addAll(List<T> results) {
         this.vals.addAll(results);
     }
 
+    public String getUrl() {
+        return url;
+    }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

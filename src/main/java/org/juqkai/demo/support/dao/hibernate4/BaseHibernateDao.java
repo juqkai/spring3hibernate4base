@@ -1,6 +1,7 @@
 package org.juqkai.demo.support.dao.hibernate4;
 
 import org.hibernate.*;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.type.Type;
@@ -9,6 +10,9 @@ import org.juqkai.demo.support.dao.IBaseDao;
 import org.juqkai.demo.support.log.Log;
 import org.juqkai.demo.support.log.Logs;
 import org.juqkai.demo.support.util.Assert;
+import org.juqkai.demo.support.util.Param;
+import org.juqkai.demo.support.util.Params;
+import org.juqkai.demo.support.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -19,7 +23,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extends java.io.Serializable> implements IBaseDao<M, PK> {
-
     protected static final Log LOG = Logs.get();
 
     private final Class<M> entityClass;
@@ -347,6 +350,16 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
         return part;
     }
 
+    @SuppressWarnings("unchecked")
+    public Part<M> list(Criteria criteria, Part<M> part) {
+        part.setTotal(listCount(criteria));
+        criteria.setProjection(null);
+        criteria.setFirstResult(part.getStart());
+        criteria.setMaxResults(part.getLength());
+        part.addAll(criteria.list());
+        return part;
+    }
+
     public Integer listCount(Criteria criteria) {
         criteria.setProjection(Projections.rowCount());
         return Integer.parseInt(criteria.uniqueResult().toString());
@@ -377,6 +390,20 @@ public abstract class BaseHibernateDao<M extends java.io.Serializable, PK extend
                 }
             }
         }
+    }
+
+    public Part<M> findForParams(Params params, Part<M> part) {
+        Criteria criteria = getSession().createCriteria(entityClass);
+        Assert.notNull(params);
+        List<Param> list = params.parse();
+        for (Param p : list) {
+            if (Strings.isBlank(p.getVal())) {
+                continue;
+            }
+            Criterion criterion = p.makeRestrictions();
+            criteria.add(criterion);
+        }
+        return list(criteria, part);
     }
 
 }
